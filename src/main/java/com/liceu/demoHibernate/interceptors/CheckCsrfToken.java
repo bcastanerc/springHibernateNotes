@@ -1,7 +1,6 @@
 package com.liceu.demoHibernate.interceptors;
 
 import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;

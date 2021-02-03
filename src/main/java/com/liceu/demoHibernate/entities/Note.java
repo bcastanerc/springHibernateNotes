@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Component
 @Entity(name = "note")
@@ -16,8 +17,8 @@ public class Note {
     String title;
     String text;
 
-    LocalDate date;
-    LocalDate last_modification;
+    LocalDateTime date;
+    LocalDateTime last_modification;
 
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
@@ -47,22 +48,6 @@ public class Note {
         this.text = text;
     }
 
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public LocalDate getLast_modification() {
-        return last_modification;
-    }
-
-    public void setLast_modification(LocalDate last_modification) {
-        this.last_modification = last_modification;
-    }
-
     @Nullable
     public User getUser() {
         return user;
@@ -82,5 +67,21 @@ public class Note {
                 ", last_modification=" + last_modification +
                 ", user=" + user.toString() +
                 '}';
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
+    public LocalDateTime getLast_modification() {
+        return last_modification;
+    }
+
+    public void setLast_modification(LocalDateTime last_modification) {
+        this.last_modification = last_modification;
     }
 }

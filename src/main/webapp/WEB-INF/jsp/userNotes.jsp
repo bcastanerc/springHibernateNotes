@@ -2,7 +2,7 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<jsp:useBean id="sanitize" class="com.liceu.notes.utils.sanitize"/>
+<jsp:useBean id="sanitize" class="com.liceu.demoHibernate.utils.sanitize"/>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />

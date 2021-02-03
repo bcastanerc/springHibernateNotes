@@ -2,6 +2,7 @@ package com.liceu.demoHibernate.config;
 
 import com.liceu.demoHibernate.interceptors.CheckCsrfToken;
 import com.liceu.demoHibernate.interceptors.GenerateCsrfToken;
+import com.liceu.demoHibernate.interceptors.LogOutInterceptor;
 import com.liceu.demoHibernate.interceptors.SessionInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -31,12 +32,16 @@ public class AppConfig implements WebMvcConfigurer {
     @Autowired
     CheckCsrfToken checkCsrfToken;
 
+    @Autowired
+    LogOutInterceptor logOutInterceptor;
+
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(sessionInterceptor).addPathPatterns(getInterceptorMapping());
         registry.addInterceptor(generateCsrfToken).addPathPatterns("/*");
         registry.addInterceptor(checkCsrfToken).addPathPatterns("/*");
+        registry.addInterceptor(logOutInterceptor).addPathPatterns("/*");
     }
 
     @Bean

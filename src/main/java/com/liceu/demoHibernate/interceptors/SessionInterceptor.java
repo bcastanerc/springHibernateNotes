@@ -15,7 +15,7 @@ public class SessionInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
-        Object o = session.getAttribute("user_id");
+        Object o = session.getAttribute("user_email");
         if (o != null) {
             return true;
         }
