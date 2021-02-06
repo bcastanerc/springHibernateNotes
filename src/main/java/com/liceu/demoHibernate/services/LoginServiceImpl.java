@@ -11,10 +11,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,11 +23,12 @@ import java.util.Map;
 @Service
 public class LoginServiceImpl implements LoginService {
 
-    String clientId = "608911812461-3macd3ntaevl2ihpp8tgeou8i36q7as9.apps.googleusercontent.com";
-
-    String clientSecret = "MUIeiAuTcjAbj3tXR5dEKir2";
-
-    String redirecturi = "http://localhost:8080/auth/oauth2callback/";
+    @Value("${client-id}")
+    String clientId;
+    @Value("${client-secret}")
+    String clientSecret;
+    @Value("${redirect-uri}")
+    String redirecturi;
 
     public URL getGoogleRedirectURL() throws Exception {
         URIBuilder b = new URIBuilder("https://accounts.google.com/o/oauth2/v2/auth");

@@ -1,7 +1,9 @@
 package com.liceu.demoHibernate.controllers;
 
 import com.liceu.demoHibernate.services.RegisterService;
+import com.liceu.demoHibernate.services.RegisterServiceImpl;
 import com.liceu.demoHibernate.services.UserService;
+import com.liceu.demoHibernate.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

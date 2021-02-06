@@ -3,10 +3,7 @@ package com.liceu.demoHibernate.controllers;
 import com.liceu.demoHibernate.entities.Note;
 import com.liceu.demoHibernate.entities.User;
 import com.liceu.demoHibernate.entities.UserNote;
-import com.liceu.demoHibernate.services.NoteService;
-import com.liceu.demoHibernate.services.RegisterService;
-import com.liceu.demoHibernate.services.UserNoteService;
-import com.liceu.demoHibernate.services.UserService;
+import com.liceu.demoHibernate.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +16,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class NoteController {
@@ -74,13 +72,12 @@ public class NoteController {
 
     @Transactional
     @PostMapping("/userNotes")
-    public String postUserNotes(@RequestParam int inputType,@RequestParam String searchInput,HttpSession session, Model model, HttpServletRequest req){
-
+    public String postUserNotes(@RequestParam("inputType") Optional<Integer> inputType, @RequestParam("searchInput") Optional<String> searchInput, HttpSession session, Model model, HttpServletRequest req){
         User u =  userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
-        if(searchInput != null && !searchInput.equals("")) {
+        if(searchInput.isPresent() && !searchInput.get().equals("")) {
             List<Note> notes = noteService.cutNotes(noteService.findAllNotesByUserId(u.getId()));
             model.addAttribute("csrfToken", req.getParameter("_csrftoken"));
-            model.addAttribute("notes", noteService.filterNotes(notes, searchInput, inputType));
+            model.addAttribute("notes", noteService.filterNotes(notes, searchInput.get(), inputType.get()));
             return "/userNotes";
         }
 
@@ -122,5 +119,8 @@ public class NoteController {
         return "redirect:/userNotes";
     }
 
-
+    @GetMapping("/updateNote")
+    public String getUpdateNote(@RequestParam Long id,HttpSession session){
+        return "/updateNote";
+    }
 }

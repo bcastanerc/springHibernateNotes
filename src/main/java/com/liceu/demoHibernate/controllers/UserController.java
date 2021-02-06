@@ -2,6 +2,7 @@ package com.liceu.demoHibernate.controllers;
 
 import com.liceu.demoHibernate.entities.User;
 import com.liceu.demoHibernate.services.UserService;
+import com.liceu.demoHibernate.services.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +27,8 @@ public class UserController {
             session.invalidate();
             return "redirect:/login";
         }
+        if (actualUser.getLoggedByOauth()) model.addAttribute("oauth", true);
+        else model.addAttribute("oauth", false);
         model.addAttribute("username", actualUser.getUsername());
         model.addAttribute("email", actualUser.getEmail());
         return "/userInfo";

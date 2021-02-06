@@ -30,41 +30,57 @@
             placeholder="${username}"
             name="username"
           />
-
-          <label>Email address</label>
-          <input
-            type="email"
-            class="form-control"
-            aria-describedby="emailHelp"
-            placeholder="${email}"
-            name="email"
-          />
-          
+          <c:if test="${oauth eq true}">
+            <label>Email address</label>
+            <input
+              type="email"
+              class="form-control"
+              aria-describedby="emailHelp"
+              value="${email}"
+              name="email"
+              disabled
+            />
+            <small class="form-text text-muted"
+            >You can't change your email if you are registered via Google</small
+            >
+          </c:if>
+          <c:if test="${oauth eq false}">
+            <label>Email address</label>
+            <input
+              type="email"
+              class="form-control"
+              aria-describedby="emailHelp"
+              placeholder="${email}"
+              name="email"
+            />
+          </c:if>
         </div>
-        <div class="form-group">
-          <label>Password</label>
-          <input
-            type="password"
-            class="form-control"
-            placeholder="password"
-            name="password"
-          />
+          <c:if test="${oauth eq false}">
+            <div class="form-group">
+              <label>Password</label>
+              <input
+                type="password"
+                class="form-control"
+                placeholder="password"
+                name="password"
+              />
 
-          <div class="form-group">
-          <label> Confirm Password</label>
-          <input
-            type="password"
-            class="form-control"
-            placeholder="password"
-            name="confirmPassword"
-          />
+            <div class="form-group">
+              <label> Confirm Password</label>
+              <input
+                type="password"
+                class="form-control"
+                placeholder="password"
+                name="confirmPassword"
+              />
+          </c:if>
         </div>
-        <button type="submit" class="btn btn-primary">Update</button>
+        <button type="submit" class="btn btn-primary mb-2">Update</button>
         <input type="hidden" name="_csrftoken" value="${csrfToken}">
       </form>
 
       <!-- Button trigger modal -->
-      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#exampleModal">
+      <button type="button" class="btn btn-danger mb-2" data-toggle="modal" data-target="#exampleModal">
         Delete Account
       </button>
 
