@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<jsp:useBean id="sanitize" class="com.liceu.notes.utils.sanitize"/>
-<jsp:useBean id="markdown" class="com.liceu.notes.utils.markdown"/>
+<jsp:useBean id="sanitize" class="com.liceu.demoHibernate.utils.sanitize"/>
+<jsp:useBean id="markdown" class="com.liceu.demoHibernate.utils.markdown"/>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -26,9 +26,9 @@
       </div>
       <div class="mb-2">
         <small class="text-muted"><b>Owner:</b> ${ownerEmail}</small>
-        <small class="text-muted"><b>Creation:</b> ${note.creation_date}, <b>Last Edit:</b> ${note.last_modification}</small>
+        <small class="text-muted"><b>Creation:</b> ${note.date}, <b>Last Edit:</b> ${note.last_modification}</small>
       </div>
-      <c:if test="${owner eq true}">
+      <c:if test="${edit eq true}">
         <a href="/updateNote?id=${note.id}" class="btn btn-primary">Edit</a>
       </c:if>
     </main>

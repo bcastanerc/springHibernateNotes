@@ -2,7 +2,10 @@ package com.liceu.demoHibernate.controllers;
 
 import com.liceu.demoHibernate.entities.Note;
 import com.liceu.demoHibernate.entities.User;
+import com.liceu.demoHibernate.entities.UserNote;
 import com.liceu.demoHibernate.services.NoteService;
+import com.liceu.demoHibernate.services.RegisterService;
+import com.liceu.demoHibernate.services.UserNoteService;
 import com.liceu.demoHibernate.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.security.NoSuchAlgorithmException;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
-public class Controller1 {
+public class NoteController {
 
     @Autowired
     UserService userService;
@@ -26,51 +29,18 @@ public class Controller1 {
     @Autowired
     NoteService noteService;
 
-    @GetMapping("/register")
-    public String getRegister(){
-        return "/register";
-    }
+    @Autowired
+    UserNoteService userNoteService;
 
-    @PostMapping("/register")
-    public String registerUser(Model model, @RequestParam String _csrftoken, @RequestParam String email, @RequestParam String password, @RequestParam String username, @RequestParam String confirmPassword) throws NoSuchAlgorithmException {
-        if (password.equals(confirmPassword) && userService.isPasswordValid(password) && userService.isEmailValid(email) &&  userService.isUsernameValid(username)){
-            User u = new User();
-            u.setUsername(username);
-            u.setEmail(email);
-            u.setPassword(userService.encryptPassword(password));
-            userService.save(u);
-            return "redirect:/login";
-        }else{
-            model.addAttribute("error", true);
-            model.addAttribute("csrfToken", _csrftoken);
-            return "/register";
-        }
-    }
-
-    @GetMapping("/login")
-    public String getLogin(){
-        return "/login";
-    }
-
-    @PostMapping("/login")
-    public String postLogin(@RequestParam String email, @RequestParam String password, HttpSession session, Model model, @RequestParam String _csrftoken) throws NoSuchAlgorithmException {
-        User logedUSer = userService.findUserByEmailEquals(email);
-        String encryptedPassword = userService.encryptPassword(password);
-        if (logedUSer != null && logedUSer.getPassword().equals(encryptedPassword)){
-            session.setAttribute("user_email", logedUSer.getEmail());
-            return "redirect:/createNotes";
-        }else{
-            model.addAttribute("error", true);
-            model.addAttribute("csrfToken", _csrftoken);
-            return "/login";
-        }
-    }
+    @Autowired
+    RegisterService registerService;
 
     @GetMapping("/createNotes")
     public String getCreateNotes(){
         return "/createNotes";
     }
 
+    @Transactional
     @PostMapping("/createNotes")
     public String postCreateNotes(@RequestParam String title, @RequestParam String text, Model model, @RequestParam String _csrftoken, HttpSession session){
 
@@ -96,32 +66,61 @@ public class Controller1 {
     public String getUserNotes(HttpSession session, Model model){
         if (model.getAttribute("notes") == null){
             User u = userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
-            List<Note> notes = noteService.findAllByUser(u);
+            List<Note> notes = noteService.cutNotes(noteService.findAllNotesByUserId(u.getId()));
             model.addAttribute("notes", notes);
         }
         return "/userNotes";
     }
 
+    @Transactional
     @PostMapping("/userNotes")
-    public String postUserNotes(HttpSession session, Model model, HttpServletRequest req){
+    public String postUserNotes(@RequestParam int inputType,@RequestParam String searchInput,HttpSession session, Model model, HttpServletRequest req){
+
+        User u =  userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
+        if(searchInput != null && !searchInput.equals("")) {
+            List<Note> notes = noteService.cutNotes(noteService.findAllNotesByUserId(u.getId()));
+            model.addAttribute("csrfToken", req.getParameter("_csrftoken"));
+            model.addAttribute("notes", noteService.filterNotes(notes, searchInput, inputType));
+            return "/userNotes";
+        }
 
         String[] ids = req.getParameterValues("notesToDelete[]");
         if (ids != null){
-            User u =  userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
             for (String id : ids) {
                 Note n = noteService.findNoteByIdAndUser(Long.parseLong(id),u);
-                if ( n != null) noteService.delete(n);
-                //else noteService.deleteSharedNote(user_id, Integer.parseInt(id));
+                if ( n != null){
+                    noteService.delete(n);
+                } else{
+                    Note trueNote = noteService.findById(Long.parseLong(id));
+                    UserNote us = userNoteService.findByUserAndNote(u,trueNote);
+                    userNoteService.delete(us);
+                }
             }
         }
 
         return "redirect:/userNotes";
     }
 
-
-    @GetMapping("/error")
-    public String getError(){
-        return "/error";
+    @GetMapping("/viewNote")
+    public String getViewNote(HttpSession session, @RequestParam Long id, Model model){
+        try {
+            // If id is not null, to prevent null pointer if the user force /viewNote whith no params.
+            if (id != null){
+                User u = userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
+                Note n = noteService.findById(id);
+                // The user can see the note if is the owner or is shared to him, can't force by url.
+                if (userService.userOwnsNote(u,n) || userNoteService.isNoteSharedToUser(u,n)){
+                    model.addAttribute("note", n);
+                    model.addAttribute("ownerEmail", n.getUser().getEmail());
+                    model.addAttribute("edit", userService.userCanEditNote(u,n));
+                    return "/viewNote";
+                }
+            }
+        }catch (Exception e){
+           return "/error";
+        }
+        return "redirect:/userNotes";
     }
+
 
 }

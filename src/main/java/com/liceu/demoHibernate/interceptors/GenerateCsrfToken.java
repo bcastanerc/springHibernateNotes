@@ -20,7 +20,6 @@ public class GenerateCsrfToken implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest req, HttpServletResponse resp, Object handler) throws Exception {
-
         if (req.getMethod().equalsIgnoreCase("GET")) {
             Cache<String, Boolean> tokenCache = (Cache<String, Boolean>) session.getAttribute("tokenCache");
             if (tokenCache == null) {
@@ -30,7 +29,6 @@ public class GenerateCsrfToken implements HandlerInterceptor {
                         .build();
                 session.setAttribute("tokenCache", tokenCache);
             }
-
             String token = UUID.randomUUID().toString();
             tokenCache.put(token, true);
             req.setAttribute("csrfToken", token);

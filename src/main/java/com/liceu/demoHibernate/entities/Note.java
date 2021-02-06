@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Set;
 
-@Component
 @Entity(name = "note")
 public class Note {
     @Id
@@ -23,6 +23,9 @@ public class Note {
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     User user;
+
+    @OneToMany(mappedBy = "note", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE,orphanRemoval = true)
+    Set<UserNote> userNotes;
 
     public Long getId() {
         return id;

@@ -4,6 +4,7 @@ import com.liceu.demoHibernate.entities.Note;
 import com.liceu.demoHibernate.entities.User;
 import com.liceu.demoHibernate.repos.NoteRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -29,7 +30,7 @@ public class NoteService {
     }
 
     public void delete(Note note){
-     noteRepo.delete(note);
+     noteRepo.deleteById(note.getId());
     }
 
     public List<Note> findAllByUser(User u){
@@ -38,6 +39,23 @@ public class NoteService {
 
     public Note findNoteByIdAndUser(Long note_id,User u){
         return noteRepo.findNoteByIdAndUser(note_id,u);
+    }
+
+    public List<Note> findAllNotesByUserId(Long id){
+        return noteRepo.findAllNotesByUserId(id);
+    }
+
+    /**
+     * Cuts the note text and title to the maximum size of the note to a better display.
+     * @param notes Notes of the user.
+     * @return the same notes but with max of characters.
+     */
+    public List<Note> cutNotes(List<Note> notes){
+        for(Note n : notes){
+            if(n.getText().length() > 230) n.setText(n.getText().substring(0,230) + "...");
+            if(n.getTitle().length() > 37) n.setTitle(n.getTitle().substring(0,37) + "...");
+        }
+        return notes;
     }
 
     /**

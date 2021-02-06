@@ -1,5 +1,6 @@
 package com.liceu.demoHibernate.services;
 
+import com.liceu.demoHibernate.entities.Note;
 import com.liceu.demoHibernate.entities.User;
 import com.liceu.demoHibernate.repos.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import java.util.regex.Pattern;
 public class UserService {
     @Autowired
     UserRepo userRepo;
+
+    @Autowired
+    UserNoteService userNoteService;
 
     /**
      * Checks if the password matches de regex pattern.
@@ -66,6 +70,22 @@ public class UserService {
             hexString.append(Integer.toHexString(0xFF & b));
         }
         return hexString.toString();
+    }
+
+    public void delete(User u){
+        userRepo.delete(u);
+    }
+
+    public boolean userOwnsNote(User u, Note n){
+        return u.getEmail().equals(n.getUser().getEmail());
+    }
+
+    public boolean userCanEditNote(User u, Note n){
+        return userOwnsNote(u, n) || userNoteService.findByUserAndNote(u, n).getPermisions().equals("write");
+    }
+
+    public void deleteUserByEmail(String email){
+        userRepo.deleteUserByEmailEquals( email);
     }
 
     public User findById(Long user_id){

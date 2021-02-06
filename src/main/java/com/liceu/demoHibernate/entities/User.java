@@ -1,11 +1,12 @@
 package com.liceu.demoHibernate.entities;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@Component
 @Entity(name = "user")
 public class User {
     @Id
@@ -16,9 +17,13 @@ public class User {
     String username;
     String password;
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = true)
+    Boolean loggedByOauth;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
     Set<Note> note;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<UserNote> userNotes;
 
     public Long getId() {
         return id;
@@ -69,5 +74,21 @@ public class User {
                 ", password='" + password + '\'' +
                 ", note=" + note +
                 '}';
+    }
+
+    public Boolean getLoggedByOauth() {
+        return loggedByOauth;
+    }
+
+    public void setLoggedByOauth(Boolean loggedByOauth) {
+        this.loggedByOauth = loggedByOauth;
+    }
+
+    public Set<UserNote> getUserNotes() {
+        return userNotes;
+    }
+
+    public void setUserNotes(Set<UserNote> userNotes) {
+        this.userNotes = userNotes;
     }
 }

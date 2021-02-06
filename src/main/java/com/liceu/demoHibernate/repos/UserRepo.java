@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface UserRepo extends JpaRepository<User, Long> {
     User findUserByEmailEquals(String email);
+    void deleteUserByEmailEquals(String email);
 }

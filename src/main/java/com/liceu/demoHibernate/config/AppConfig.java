@@ -35,7 +35,6 @@ public class AppConfig implements WebMvcConfigurer {
     @Autowired
     LogOutInterceptor logOutInterceptor;
 
-
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(sessionInterceptor).addPathPatterns(getInterceptorMapping());
