@@ -7,7 +7,7 @@ import com.liceu.demoHibernate.entities.UserNote;
 import java.util.List;
 
 public interface UserNoteService {
-    UserNote findByUserAndNote(User u, Note n) throws Exception;
+    UserNote findByUserAndNote(User u, Note n);
     void deleteByUserAndNote(User u, Note n);
     void delete(UserNote userNote);
     boolean isNoteSharedToUser(User u, Note n) throws Exception;

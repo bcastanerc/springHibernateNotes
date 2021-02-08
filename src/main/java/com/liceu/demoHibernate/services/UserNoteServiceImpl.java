@@ -22,7 +22,7 @@ public class UserNoteServiceImpl implements UserNoteService{
     @Autowired
     NoteService noteService;
 
-    public UserNote findByUserAndNote(User u, Note n) throws Exception{
+    public UserNote findByUserAndNote(User u, Note n){
         return userNoteRepo.findByUserAndNote(u,n).get();
     }
 

@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService{
     }
 
     public boolean userCanEditNote(User u, Note n) throws Exception{
-        return userOwnsNote(u, n) || userNoteService.findByUserAndNote(u, n).getPermisions().equals("write");
+        return userOwnsNote(u, n) || userNoteService.findByUserAndNote(u, n).getPermisions().equals("Write");
     }
 
     public void deleteUserByEmail(String email){

@@ -45,20 +45,22 @@
             placeholder="Enter email"
             name="emailToShare"
           />
-          <small class="form-text text-muted"
+          <small id="smallText" class="form-text text-muted"
             >Introduce the email of the person to share/un-share</small
           >
         </div>
           <label style="margin-right: 20px;"><small>Share</small></label>
-          <input type="radio" checked="checked" class="intd form-check-input" name="actionType" value="share">
-          <label style="margin-right: 20px;"><small>Un-Share</small></label>
-          <input type="radio" class="intd form-check-input" name="actionType" value="delete">
-          <label style="margin-left: 20px;">Permissions:</label>
-          <select name="permissions" class="form-control mb-3">
-             <option value="read" selected="selected">Read</option>
-             <option value="Write">Write</option>
-          </select>
-          <button type="submit" class="btn btn-primary">Share</button>
+          <input id="radioShare" type="radio" checked="checked" class="intd form-check-input" name="actionType" value="share">
+          <label style="margin-right: 24px;"><small>Un-Share</small></label>
+          <input id="radioUnshare" type="radio" class="intd form-check-input" name="actionType" value="delete">
+          <div id="sharePermission" class="form-group">
+              <label><b>Permissions:</b></label>
+              <select name="permissions" class="form-control mb-3">
+                  <option value="Read" selected="selected">Read</option>
+                  <option value="Write">Write</option>
+              </select>
+          </div>
+          <button id="shareButton" type="submit" class="btn btn-primary">Share</button>
           <input type="hidden" name="id" value="${note.id}">
           <input type="hidden" name="_csrftoken" value="${csrfToken}">
         </form>
@@ -66,12 +68,14 @@
           <thead>
             <tr>
               <th>Shared Users</th>
+              <th>Permission</th>
             </tr>
           </thead>
           <tbody>
-            <c:forEach var="u" items="${usersShared}">
+            <c:forEach var="u" items="${usersShared}" varStatus="status">
               <tr>
                 <td>${u.email}</td>
+                <td>${permisions[status.index]}</td>
               </tr>
             </c:forEach>
           </tbody>
@@ -90,6 +94,18 @@
         text-align: center;
       }
     </style>
+  <script>
+    document.querySelector("#radioShare").addEventListener("click", function (){
+        document.querySelector("#shareButton").innerHTML = "Share";
+        document.querySelector("#smallText").innerHTML = "Introduce the email of the person to share this note";
+        document.querySelector("#sharePermission").style.display = "inline";
+    })
+    document.querySelector("#radioUnshare").addEventListener("click", function (){
+        document.querySelector("#shareButton").innerHTML = "Un-Share";
+        document.querySelector("#smallText").innerHTML = "Introduce the email of the person to un-share this note";
+        document.querySelector("#sharePermission").style.display = "none";
+    })
+  </script>
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
       integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

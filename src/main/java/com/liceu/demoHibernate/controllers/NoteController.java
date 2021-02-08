@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,15 +120,20 @@ public class NoteController {
     public String getUpdateNote(@RequestParam Long id, HttpServletRequest req, HttpSession session, Model model){
         try {
             if (id != null){
-                Note n = noteService.findById(id);
                 User u = userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
-                if (userService.userOwnsNote(u,n)){
+                Note n = noteService.findById(id);
+                if (userService.userCanEditNote(u,n)){
                     if(req.getParameter("deleteNote") != null){
-                        noteService.delete(n);
+                        if (userService.userOwnsNote(u,n)) noteService.delete(n);
+                        else userNoteService.delete(userNoteService.findByUserAndNote(u,n));
                         return "redirect:/userNotes";
                     }
                     model.addAttribute("note",n);
-                    model.addAttribute("usersShared",userNoteService.findAllUsersSharedNote(n.getId()));
+                    List<User> usersShared = userNoteService.findAllUsersSharedNote(n.getId());
+                    model.addAttribute("usersShared",usersShared);
+                    List<String> permisions = new ArrayList<>();
+                    usersShared.forEach((User user) -> permisions.add(userNoteService.findByUserAndNote(user,n).getPermisions()));
+                    model.addAttribute("permisions",permisions);
                     return "/updateNote";
                 }
             }
@@ -143,14 +148,13 @@ public class NoteController {
                                  @RequestParam Optional<String> permissions, @RequestParam Optional<String> title, @RequestParam Optional<String> text,
                                  HttpSession session){
         try {
-            if (userService.userOwnsNote(userService.findUserByEmailEquals((String) session.getAttribute("user_email")),noteService.findById(id))){
+            if (userService.userCanEditNote(userService.findUserByEmailEquals((String) session.getAttribute("user_email")),noteService.findById(id))){
                 if (emailToShare.isPresent() && userService.findUserByEmailEquals(emailToShare.get()) != null && actionType.isPresent()) {
                     if (actionType.get().equals("share")) userNoteService.save(userService.findUserByEmailEquals(emailToShare.get()).getId(),id,permissions.get());
                     if (actionType.get().equals("delete")) userNoteService.delete(userNoteService.findByUserAndNote(userService.findUserByEmailEquals(emailToShare.get()), noteService.findById(id)));
                     return "redirect:/userNotes";
                 }
             }
-
             if (!emailToShare.isPresent() && title.isPresent() && !title.get().equals("") && text.isPresent() && !text.get().equals("")){
                 LocalDateTime now = LocalDateTime.now();
                 noteService.save(id,title.get(),text.get(),null,null, now);

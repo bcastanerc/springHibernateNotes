@@ -51,7 +51,7 @@
       </form>
        <c:if test="${error eq true}">
         <div style="margin-top: 20px;" class="alert alert-warning fade show">
-          <strong>Warning!</strong> Please enter a valid email and password to log in. If you are registered via <a href="/logingoogle">Google Auth</a> you must use that method to log. If you don't have an account <strong><a href="/register">register</a></strong> first.
+          <strong>Warning!</strong> Please enter a valid email and password to log in. If you are registered via <a href="/logingoogle">Google Auth</a> you must use that method to log. If you don't have an account <strong><a class="alert-link" href="/register">register</a></strong> first.
           <button type="button" class="close" data-dismiss="alert"></button>
         </div>
       </c:if>
