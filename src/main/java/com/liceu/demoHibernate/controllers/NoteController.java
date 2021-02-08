@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,15 +49,8 @@ public class NoteController {
             model.addAttribute("csrfToken", _csrftoken);
             return "createNotes";
         }
-        User u = userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
         LocalDateTime now = LocalDateTime.now();
-        Note n = new Note();
-        n.setTitle(title);
-        n.setText(text);
-        n.setUser(u);
-        n.setDate(now);
-        n.setLast_modification(now);
-        noteService.save(n);
+        noteService.save(null, title, text, userService.findUserByEmailEquals((String) session.getAttribute("user_email")),now,now);
         return "redirect:/userNotes";
     }
 
@@ -72,30 +66,33 @@ public class NoteController {
 
     @Transactional
     @PostMapping("/userNotes")
-    public String postUserNotes(@RequestParam("inputType") Optional<Integer> inputType, @RequestParam("searchInput") Optional<String> searchInput, HttpSession session, Model model, HttpServletRequest req){
-        User u =  userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
-        if(searchInput.isPresent() && !searchInput.get().equals("")) {
-            List<Note> notes = noteService.cutNotes(noteService.findAllNotesByUserId(u.getId()));
-            model.addAttribute("csrfToken", req.getParameter("_csrftoken"));
-            model.addAttribute("notes", noteService.filterNotes(notes, searchInput.get(), inputType.get()));
-            return "/userNotes";
-        }
+    public String postUserNotes(@RequestParam Optional<Integer> inputType, @RequestParam Optional<String> searchInput, HttpSession session, Model model, HttpServletRequest req){
+        try {
+            User u =  userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
+            if(searchInput.isPresent() && !searchInput.get().equals("")) {
+                List<Note> notes = noteService.cutNotes(noteService.findAllNotesByUserId(u.getId()));
+                model.addAttribute("csrfToken", req.getParameter("_csrftoken"));
+                model.addAttribute("notes", noteService.filterNotes(notes, searchInput.get(), inputType.get()));
+                return "/userNotes";
+            }
 
-        String[] ids = req.getParameterValues("notesToDelete[]");
-        if (ids != null){
-            for (String id : ids) {
-                Note n = noteService.findNoteByIdAndUser(Long.parseLong(id),u);
-                if ( n != null){
-                    noteService.delete(n);
-                } else{
-                    Note trueNote = noteService.findById(Long.parseLong(id));
-                    UserNote us = userNoteService.findByUserAndNote(u,trueNote);
-                    userNoteService.delete(us);
+            String[] ids = req.getParameterValues("notesToDelete[]");
+            if (ids != null){
+                for (String id : ids) {
+                    Note n = noteService.findNoteByIdAndUser(Long.parseLong(id),u);
+                    if ( n != null){
+                        noteService.delete(n);
+                    } else{
+                        Note trueNote = noteService.findById(Long.parseLong(id));
+                        UserNote us = userNoteService.findByUserAndNote(u,trueNote);
+                        userNoteService.delete(us);
+                    }
                 }
             }
+            return "redirect:/userNotes";
+        }catch (Exception e){
+            return "/error";
         }
-
-        return "redirect:/userNotes";
     }
 
     @GetMapping("/viewNote")
@@ -120,7 +117,47 @@ public class NoteController {
     }
 
     @GetMapping("/updateNote")
-    public String getUpdateNote(@RequestParam Long id,HttpSession session){
-        return "/updateNote";
+    public String getUpdateNote(@RequestParam Long id, HttpServletRequest req, HttpSession session, Model model){
+        try {
+            if (id != null){
+                Note n = noteService.findById(id);
+                User u = userService.findUserByEmailEquals((String) session.getAttribute("user_email"));
+                if (userService.userOwnsNote(u,n)){
+                    if(req.getParameter("deleteNote") != null){
+                        noteService.delete(n);
+                        return "redirect:/userNotes";
+                    }
+                    model.addAttribute("note",n);
+                    model.addAttribute("usersShared",userNoteService.findAllUsersSharedNote(n.getId()));
+                    return "/updateNote";
+                }
+            }
+            return "redirect:/userNotes";
+        }catch (Exception e){
+            return "/error";
+        }
+    }
+
+    @PostMapping("/updateNote")
+    public String postUpdateNote(@RequestParam Long id, @RequestParam Optional<String> emailToShare, @RequestParam Optional<String> actionType,
+                                 @RequestParam Optional<String> permissions, @RequestParam Optional<String> title, @RequestParam Optional<String> text,
+                                 HttpSession session){
+        try {
+            if (userService.userOwnsNote(userService.findUserByEmailEquals((String) session.getAttribute("user_email")),noteService.findById(id))){
+                if (emailToShare.isPresent() && userService.findUserByEmailEquals(emailToShare.get()) != null && actionType.isPresent()) {
+                    if (actionType.get().equals("share")) userNoteService.save(userService.findUserByEmailEquals(emailToShare.get()).getId(),id,permissions.get());
+                    if (actionType.get().equals("delete")) userNoteService.delete(userNoteService.findByUserAndNote(userService.findUserByEmailEquals(emailToShare.get()), noteService.findById(id)));
+                    return "redirect:/userNotes";
+                }
+            }
+
+            if (!emailToShare.isPresent() && title.isPresent() && !title.get().equals("") && text.isPresent() && !text.get().equals("")){
+                LocalDateTime now = LocalDateTime.now();
+                noteService.save(id,title.get(),text.get(),null,null, now);
+            }
+            return "redirect:/userNotes";
+        }catch (Exception e){
+            return "/error";
+        }
     }
 }

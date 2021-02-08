@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService{
         return u.getEmail().equals(n.getUser().getEmail());
     }
 
-    public boolean userCanEditNote(User u, Note n){
+    public boolean userCanEditNote(User u, Note n) throws Exception{
         return userOwnsNote(u, n) || userNoteService.findByUserAndNote(u, n).getPermisions().equals("write");
     }
 
@@ -88,12 +88,23 @@ public class UserServiceImpl implements UserService{
         userRepo.deleteUserByEmailEquals( email);
     }
 
-    public User findById(Long user_id){
+    public User findById(Long user_id) throws Exception{
         return userRepo.findById(user_id).get();
     }
 
-    public User save(User u){
-        return userRepo.save(u);
+    public void save(Long id, String username, String email, String password, boolean loggedByOauth) throws Exception{
+        User u;
+        if (id != null){
+            u = userRepo.findById(id).get();
+        }else{
+            u = new User();
+            u.setId(id);
+            u.setLoggedByOauth(loggedByOauth);
+        }
+        u.setUsername(username);
+        u.setEmail(email);
+        u.setPassword(password);
+        userRepo.save(u);
     }
 
     public User findUserByEmailEquals(String email){

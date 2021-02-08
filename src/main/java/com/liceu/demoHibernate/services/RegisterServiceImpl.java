@@ -12,16 +12,12 @@ public class RegisterServiceImpl implements RegisterService{
     @Autowired
     UserServiceImpl userService;
 
-    public void register(String username, String email, String password) throws NoSuchAlgorithmException {
-        User u = new User();
-        u.setUsername(username);
-        u.setEmail(email);
-        if (password == null){
-            u.setLoggedByOauth(true);
-        }else{
-            u.setPassword(userService.encryptPassword(password));
-            u.setLoggedByOauth(false);
+    public void register(String username, String email, String password) throws Exception {
+        boolean loggedByOauth = true;
+        if (password != null){
+            password = userService.encryptPassword(password);
+            loggedByOauth = false;
         }
-        userService.save(u);
+        userService.save(null, username,email,password,loggedByOauth);
     }
 }

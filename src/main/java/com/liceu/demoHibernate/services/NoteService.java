@@ -3,11 +3,12 @@ package com.liceu.demoHibernate.services;
 import com.liceu.demoHibernate.entities.Note;
 import com.liceu.demoHibernate.entities.User;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface NoteService {
-    public Note findById(Long id);
-    public Note save(Note note);
+    public Note findById(Long id) throws Exception;
+    public void save(Long id, String title, String text, User u, LocalDateTime creation, LocalDateTime lastModification);
     public void delete(Note note);
     public List<Note> findAllByUser(User u);
     public Note findNoteByIdAndUser(Long note_id,User u);

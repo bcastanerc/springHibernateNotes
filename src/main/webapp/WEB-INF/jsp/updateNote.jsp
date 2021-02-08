@@ -53,7 +53,12 @@
           <input type="radio" checked="checked" class="intd form-check-input" name="actionType" value="share">
           <label style="margin-right: 20px;"><small>Un-Share</small></label>
           <input type="radio" class="intd form-check-input" name="actionType" value="delete">
-          <button type="submit" class="btn btn-primary ml-4">Share</button>
+          <label style="margin-left: 20px;">Permissions:</label>
+          <select name="permissions" class="form-control mb-3">
+             <option value="read" selected="selected">Read</option>
+             <option value="Write">Write</option>
+          </select>
+          <button type="submit" class="btn btn-primary">Share</button>
           <input type="hidden" name="id" value="${note.id}">
           <input type="hidden" name="_csrftoken" value="${csrfToken}">
         </form>

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,12 +21,23 @@ public class NoteServiceImpl implements NoteService{
     @Autowired
     NoteRepo noteRepo;
 
-    public Note findById(Long id){
+    public Note findById(Long id) throws Exception{
         return noteRepo.findById(id).get();
     }
 
-    public Note save(Note note){
-        return noteRepo.save(note);
+    public void save(Long id, String title, String text, User u, LocalDateTime creation, LocalDateTime lastModification){
+        Note n;
+        if (id != null){
+            n = noteRepo.findById(id).get();
+        }else{
+            n = new Note();
+            n.setUser(u);
+            n.setDate(creation);
+        }
+        n.setTitle(title);
+        n.setText(text);
+        n.setLast_modification(lastModification);
+        noteRepo.save(n);
     }
 
     public void delete(Note note){
