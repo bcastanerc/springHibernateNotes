@@ -58,8 +58,10 @@ public class LoginController {
         String[] cuts = email.split("@");
         String username = cuts[0];
         session.setAttribute("user_email",email);
-        if(userService.findUserByEmailEquals(email) == null){
+        if(userService.findUserByEmailEquals(email) == null && userService.findUserByEmailEquals(email) == null){
             registerService.register(username,email,null);
+        }else{
+            return "redirect:/login";
         }
         return "redirect:/userNotes";
     }
