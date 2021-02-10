@@ -31,6 +31,27 @@
       <c:if test="${edit eq true}">
         <a href="/updateNote?id=${note.id}" class="btn btn-primary">Edit</a>
       </c:if>
+      <c:if test="${thereAreVersions eq true}">
+        <h3 class="mt-4 mb-4">Versions of this note</h3>
+          <div>
+            <div class="list-group">
+              <c:forEach var="v" items="${versions}">
+                <form method="POST" action="/viewNote">
+                <div class="list-group-item ">
+                  <h4 class="list-group-item-heading">${sanitize.sanitizeNote(v.title)}</h4>
+                  <p class="list-group-item-text">${sanitize.sanitizeNote(v.text)}</p>
+                  <div class="d-flex justify-content-between">
+                    <small class="text-muted"><b>Creation:</b> ${v.date}, <b>Last Edit:</b> ${v.last_modification}</small>
+                    <button type="submit" class="btn btn-primary btn-sm">Create from Version</button>
+                  </div>
+                </div>
+                  <input type="hidden" name="id" value="${v.id}">
+                  <input type="hidden" name="_csrftoken" value="${csrfToken}">
+                </form>
+              </c:forEach>
+            </div>
+          </div>
+      </c:if>
     </main>
     <!-- Boostrap script-->
     <script

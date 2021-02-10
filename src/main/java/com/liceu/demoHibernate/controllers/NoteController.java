@@ -3,6 +3,8 @@ package com.liceu.demoHibernate.controllers;
 import com.liceu.demoHibernate.entities.Note;
 import com.liceu.demoHibernate.entities.User;
 import com.liceu.demoHibernate.entities.UserNote;
+import com.liceu.demoHibernate.entities.Version;
+import com.liceu.demoHibernate.repos.VersionRepo;
 import com.liceu.demoHibernate.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -33,6 +35,9 @@ public class NoteController {
 
     @Autowired
     RegisterService registerService;
+
+    @Autowired
+    VersionService versionService;
 
     @GetMapping("/createNotes")
     public String getCreateNotes(){
@@ -107,11 +112,26 @@ public class NoteController {
                     model.addAttribute("note", n);
                     model.addAttribute("ownerEmail", n.getUser().getEmail());
                     model.addAttribute("edit", userService.userCanEditNote(u,n));
+                    model.addAttribute("versions", versionService.findAllByNote_Id(n.getId()));
+                    model.addAttribute("thereAreVersions", !versionService.findAllByNote_Id(n.getId()).isEmpty());
                     return "/viewNote";
                 }
             }
         }catch (Exception e){
-           return "/error";
+            return "/error";
+        }
+        return "redirect:/userNotes";
+    }
+
+    @PostMapping("/viewNote")
+    public String postViewNote(HttpSession session, @RequestParam Long id){
+        try {
+            if (id != null){
+                Version v = versionService.findById(id);
+                noteService.save(null, v.getTitle(), v.getText(), userService.findUserByEmailEquals((String) session.getAttribute("user_email")),v.getDate(),v.getLast_modification());
+            }
+        }catch (Exception e){
+            return "/error";
         }
         return "redirect:/userNotes";
     }
@@ -156,6 +176,15 @@ public class NoteController {
                 }
             }
             if (!emailToShare.isPresent() && title.isPresent() && !title.get().equals("") && text.isPresent() && !text.get().equals("")){
+                Note n = noteService.findById(id);
+                Version v = new Version();
+                v.setNote(n);
+                v.setTitle(n.getTitle());
+                v.setText(n.getText());
+                v.setEmail((String) session.getAttribute("user_email"));
+                v.setDate(n.getDate());
+                v.setLast_modification(n.getLast_modification());
+                versionService.save(v);
                 LocalDateTime now = LocalDateTime.now();
                 noteService.save(id,title.get(),text.get(),null,null, now);
             }

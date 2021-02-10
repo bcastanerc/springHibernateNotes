@@ -24,6 +24,9 @@ public class Note {
     @JoinColumn(name = "user_id", nullable = false)
     User user;
 
+    @OneToMany(mappedBy = "note", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    Set<Version> version;
+
     @OneToMany(mappedBy = "note", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE,orphanRemoval = true)
     Set<UserNote> userNotes;
 
