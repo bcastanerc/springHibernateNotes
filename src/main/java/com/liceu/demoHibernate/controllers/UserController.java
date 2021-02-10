@@ -33,6 +33,11 @@ public class UserController {
             }
             if (actualUser.getLoggedByOauth()) model.addAttribute("oauth", true);
             else model.addAttribute("oauth", false);
+            String picture = (String) session.getAttribute("picture");
+            if (picture != null){
+                model.addAttribute("picture", true);
+                model.addAttribute("pictureSrc", picture);
+            }
             model.addAttribute("username", actualUser.getUsername());
             model.addAttribute("email", actualUser.getEmail());
             return "/userInfo";

@@ -4,7 +4,6 @@ import com.liceu.demoHibernate.entities.Note;
 import com.liceu.demoHibernate.entities.User;
 import com.liceu.demoHibernate.entities.UserNote;
 import com.liceu.demoHibernate.entities.Version;
-import com.liceu.demoHibernate.repos.VersionRepo;
 import com.liceu.demoHibernate.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

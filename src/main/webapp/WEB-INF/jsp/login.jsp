@@ -50,8 +50,8 @@
         <input type="hidden" name="_csrftoken" value="${csrfToken}">
       </form>
        <c:if test="${error eq true}">
-        <div style="margin-top: 20px;" class="alert alert-warning fade show">
-          <strong>Warning!</strong> Please enter a valid email and password to log in. If you are registered via <a href="/logingoogle">Google Auth</a> you must use that method to log. If you don't have an account <strong><a class="alert-link" href="/register">register</a></strong> first.
+        <div id="error" style="margin-top: 20px;" class="alert alert-warning fade show">
+          <strong>Warning!</strong> Please enter a valid email and password to log in. If you are registered via <a class="alert-link" href="/logingoogle">Google Auth</a> you must use that method to log. If you don't have an account <strong><a class="alert-link" href="/register">register</a></strong> first.
           <button type="button" class="close" data-dismiss="alert"></button>
         </div>
       </c:if>
@@ -62,5 +62,8 @@
       integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
       crossorigin="anonymous"
     ></script>
+  <script>
+    if (window.location.href.includes("error")) document.querySelector("#error").innerHTML = "<strong>Warning!</strong> If you loged by application registration you can't login with google and viceversa";
+  </script>
   </body>
 </html>

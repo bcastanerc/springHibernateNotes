@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class LoginController {
@@ -25,7 +26,8 @@ public class LoginController {
     RegisterService registerService;
 
     @GetMapping("/login")
-    public String getLogin(){
+    public String getLogin(@RequestParam Optional<Boolean> error, Model model){
+        if ((error.isPresent())) model.addAttribute("error", true);
         return "/login";
     }
 
@@ -54,17 +56,18 @@ public class LoginController {
     public String oauthCallback(@RequestParam String code, HttpSession session) throws Exception {
         String accessToken = loginService.getAccessToken(code);
         Map<String,String> userDetails = loginService.getUserDetails(accessToken);
+        String picture = userDetails.get("picture");
         String email = userDetails.get("email");
         String[] cuts = email.split("@");
         String username = cuts[0];
-        if(userService.findUserByEmailEquals(email) == null){
-            registerService.register(username,email,null);
-        }
+        if(userService.findUserByEmailEquals(email) == null) registerService.register(username,email,null);
+
         if (userService.findUserByEmailEquals(email).getLoggedByOauth()){
+            session.setAttribute("picture",picture);
             session.setAttribute("user_email",email);
             return "redirect:/userNotes";
         }
-        return "redirect:/login";
+        return "redirect:/login?error=true";
     }
 
 

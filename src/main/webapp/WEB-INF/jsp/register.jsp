@@ -21,7 +21,7 @@
   </head>
   <body>
     <h1 class="display-3 d-flex justify-content-center">Register</h1>
-    <main class="container">
+    <main class="container w-50">
       <form method="POST" action="/register">
         <!-- Email -->
         <div class="form-group">

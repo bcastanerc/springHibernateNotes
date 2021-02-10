@@ -18,9 +18,14 @@
   <body>
   <jsp:directive.include file="./nav.jsp" />
     <h1 class="display-3 d-flex justify-content-center">Your info</h1>
-     <main class="container">
+     <main class="container w-25">
       <form method="POST" action="/userInfo">
         <div class="form-group">
+        <c:if test="${picture eq true}">
+          <div class="w-100 d-flex justify-content-center">
+            <img style="border-radius: 70px" src="${pictureSrc}" width="140" height="140" border="0" class="">
+          </div>
+          </c:if>
 
           <div class="form-group">
           <label>Username</label>
