@@ -15,6 +15,8 @@ public class Note {
     Long id;
 
     String title;
+
+    @Column(columnDefinition="TEXT")
     String text;
 
     LocalDateTime date;

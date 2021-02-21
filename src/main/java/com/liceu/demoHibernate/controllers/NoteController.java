@@ -176,15 +176,8 @@ public class NoteController {
             }
             if (!emailToShare.isPresent() && title.isPresent() && !title.get().equals("") && text.isPresent() && !text.get().equals("")){
                 Note n = noteService.findById(id);
-                Version v = new Version();
-                v.setNote(n);
-                v.setTitle(n.getTitle());
-                v.setText(n.getText());
-                v.setEmail((String) session.getAttribute("user_email"));
-                v.setDate(n.getDate());
-                v.setLast_modification(n.getLast_modification());
-                versionService.save(v);
                 LocalDateTime now = LocalDateTime.now();
+                versionService.save(null,n.getTitle(),n.getText(),now,(String) session.getAttribute("user_email"),now,n);
                 noteService.save(id,title.get(),text.get(),null,null, now);
             }
             return "redirect:/userNotes";
